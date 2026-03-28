@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Do You Like Me? 💕</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    height: 100dvh;
+    background: radial-gradient(ellipse at 20% 20%, #4a0030 0%, #1a0010 40%, #2d0020 70%, #0d0008 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Glowing orbs */
+  .orb {
+    position: fixed; border-radius: 50%;
+    filter: blur(90px); pointer-events: none; z-index: 0;
+  }
+  .orb1 { width: 500px; height: 500px; background: #ff4488; opacity: 0.12; top: -150px; left: -150px; animation: orb1 9s ease-in-out infinite alternate; }
+  .orb2 { width: 400px; height: 400px; background: #aa0044; opacity: 0.15; bottom: -100px; right: -100px; animation: orb2 11s ease-in-out infinite alternate; }
+  .orb3 { width: 250px; height: 250px; background: #ffaacc; opacity: 0.08; top: 50%; left: 50%; transform: translate(-50%,-50%); animation: orb3 7s ease-in-out infinite alternate; }
+  @keyframes orb1 { to { transform: translate(80px,100px) scale(1.1); } }
+  @keyframes orb2 { to { transform: translate(-80px,-100px) scale(1.2); } }
+  @keyframes orb3 { to { transform: translate(-50%,-50%) scale(1.5); opacity: 0.12; } }
+
+  /* Floating hearts */
+  .bg-el {
+    position: fixed; pointer-events: none; z-index: 1;
+    animation: floatUp linear infinite;
+    opacity: 0;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(-15deg) scale(0.8); opacity: 0; }
+    10%  { opacity: 0.8; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(-110vh) rotate(15deg) scale(1.1); opacity: 0; }
+  }
+  .petal {
+    position: fixed; pointer-events: none; z-index: 1;
+    width: 10px; height: 14px;
+    background: radial-gradient(ellipse, #ff8cb4, #c9184a);
+    border-radius: 50% 0 50% 0;
+    animation: petalFall linear infinite; opacity: 0;
+  }
+  @keyframes petalFall {
+    0%   { opacity: 0; }
+    10%  { opacity: 0.7; }
+    90%  { opacity: 0.4; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Card */
+  .card {
+    position: relative; z-index: 10;
+    background: rgba(255,240,250,0.055);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,120,170,0.25);
+    border-radius: 36px;
+    padding: 56px 68px;
+    text-align: center;
+    box-shadow: 0 0 80px rgba(255,80,150,0.12), 0 0 160px rgba(180,0,80,0.06), inset 0 1px 0 rgba(255,255,255,0.08);
+    max-width: 500px; width: 88vw;
+    animation: cardIn 1s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes cardIn {
+    from { opacity:0; transform: scale(0.65) translateY(50px); }
+    to   { opacity:1; transform: scale(1) translateY(0); }
+  }
+
+  .emoji-crown {
+    font-size: 3.8rem;
+    display: block;
+    margin-bottom: 12px;
+    animation: hb 1.6s ease-in-out infinite;
+  }
+  @keyframes hb {
+    0%,100%{ transform:scale(1); }
+    14%{ transform:scale(1.28); }
+    28%{ transform:scale(1); }
+    42%{ transform:scale(1.15); }
+  }
+
+  h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.9rem; font-weight: 700;
+    color: #ffb8d2;
+    text-shadow: 0 0 40px rgba(255,100,160,0.7);
+    margin-bottom: 6px; line-height: 1.2;
+  }
+
+  .sub {
+    font-style: italic; font-size: 0.9rem;
+    color: rgba(255,180,210,0.5);
+    letter-spacing: 1.5px; margin-bottom: 44px;
+  }
+
+  /* YES button stays in place */
+  .btn-yes {
+    padding: 16px 46px;
+    background: linear-gradient(135deg, #ff6ba8, #c9184a);
+    color: #fff;
+    border: none; border-radius: 50px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.55rem; font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 36px rgba(255,100,160,0.55);
+    animation: yesGlow 2s ease-in-out infinite;
+    transition: transform 0.15s;
+    position: relative; z-index: 20;
+  }
+  @keyframes yesGlow {
+    0%,100%{ box-shadow: 0 8px 36px rgba(255,100,160,0.55); }
+    50%    { box-shadow: 0 8px 56px rgba(255,100,160,0.9), 0 0 24px rgba(255,100,160,0.35); }
+  }
+  .btn-yes:hover { transform: scale(1.07); }
+
+  /* Button row */
+  .btn-row {
+    display: flex; gap: 20px; justify-content: center; align-items: center;
+    margin-top: 0;
+  }
+
+  /* NO button – sits in row initially, goes fixed after first click */
+  #noBtn {
+    padding: 14px 40px;
+    background: rgba(255,255,255,0.07);
+    color: #ffb8d2;
+    border: 1.5px solid rgba(255,180,210,0.35);
+    border-radius: 50px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.45rem; font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+    transition: none;
+    z-index: 100;
+  }
+  #noBtn.roaming {
+    position: absolute;
+  }
+
+  /* Result screens */
+  .screen { display: none; }
+  .screen.show { display: block; animation: fadeIn 0.8s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes fadeIn {
+    from { opacity:0; transform:scale(0.78); }
+    to   { opacity:1; transform:scale(1); }
+  }
+
+  /* YES result */
+  .yes-screen .big { font-size: 5rem; display:block; margin-bottom:14px; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both, hb 1.6s ease-in-out 0.6s infinite; }
+  @keyframes popIn { from{transform:scale(0);} to{transform:scale(1);} }
+  .yes-screen h2 { font-family:'Dancing Script',cursive; font-size:2.5rem; color:#ffb8d2; text-shadow:0 0 30px rgba(255,100,160,0.8); margin-bottom:14px; }
+  .yes-screen p  { font-style:italic; color:rgba(255,180,210,0.72); font-size:1.02rem; line-height:1.75; }
+
+  /* CAT result */
+  .cat-screen img {
+    width: 170px; height: 170px; border-radius: 50%;
+    border: 4px solid #ff6ba8;
+    box-shadow: 0 0 50px rgba(255,100,160,0.55);
+    object-fit: cover; margin-bottom: 18px;
+    animation: popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .cat-screen h2 { font-family:'Dancing Script',cursive; font-size:2.2rem; color:#ffb8d2; text-shadow:0 0 20px rgba(255,100,160,0.7); margin-bottom:10px; }
+  .cat-screen p  { font-style:italic; color:rgba(255,180,210,0.65); font-size:0.97rem; margin-bottom:26px; }
+
+  /* Confetti */
+  .conf { position:fixed; width:10px; height:10px; border-radius:2px; pointer-events:none; z-index:999; animation: confFall 1.6s ease-in forwards; }
+  @keyframes confFall { 0%{transform:translateY(0) rotate(0);opacity:1;} 100%{transform:translateY(85vh) rotate(720deg);opacity:0;} }
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div id="bgContainer"></div>
+
+<!-- CARD -->
+<div class="card" id="card">
+
+  <!-- Question -->
+  <div id="qScreen">
+    <span class="emoji-crown">💕</span>
+    <h1>Do You Like Me?</h1>
+    <p class="sub">answer with your heart…</p>
+    <div class="btn-row">
+      <button class="btn-yes" id="yesMain" onclick="handleYes()">Yes 💖</button>
+      <button id="noBtn" onclick="handleNo()">No 🙈</button>
+    </div>
+  </div>
+
+  <!-- YES result -->
+  <div class="screen yes-screen" id="yesResult">
+    <span class="big">💗</span>
+    <h2>I Like You Too! 🌹</h2>
+    <p>
+      You make my heart flutter like rose petals in the wind… 🌸<br>
+      Every moment with you feels like a fairytale come true. 💫<br><br>
+      <em>Forever and always ~ 🌙✨</em>
+    </p>
+  </div>
+
+  <!-- CAT result -->
+  <div class="screen cat-screen" id="catResult">
+    <img
+      src="https://media.tenor.com/dhuQV_msfiUAAAAe/cat-gun.png"
+      onerror="this.src='https://placecats.com/170/170'"
+      alt="Cat holding heart"
+    />
+    <h2>You don't like me? 🥺</h2>
+    <p>Think again… pretty please? 🐾💕</p>
+    <button class="btn-yes" onclick="handleYes()">Okay fine, I like you! 💖</button>
+  </div>
+
+</div>
+
+<script>
+  let noCnt = 0;
+  const noBtn = document.getElementById('noBtn');
+
+  function handleNo() {
+    noCnt++;
+    if (noCnt >= 3) { showCat(); return; }
+
+    // On first click: detach from flow and go fixed at current position
+    if (noCnt === 1) {
+      const r = noBtn.getBoundingClientRect();
+      noBtn.classList.add('roaming');
+      noBtn.style.left = r.left + 'px';
+      noBtn.style.top  = r.top  + 'px';
+      noBtn.style.width = r.width + 'px';
+    }
+    moveNo();
+  }
+
+  function moveNo() {
+    const pad = 20;
+    const bw = noBtn.offsetWidth  || 130;
+    const bh = noBtn.offsetHeight || 54;
+    const minX = pad;
+    const minY = pad;
+    const maxX = document.documentElement.clientWidth - bw - pad;
+    const maxY = document.documentElement.clientHeight - bw - pad;
+    const x = minX + Math.random() * (maxX - minX);
+    const y = minY + Math.random() * (maxY - minY);
+    noBtn.style.left = Math.min(Math.max(minX, x), maxX) + 'px';
+    noBtn.style.top  = Math.min(Math.max(minY, y), maxY) + 'px';
+    noBtn.style.opacity   = Math.max(0.45, 1 - noCnt * 0.03) + '';
+    noBtn.style.transform = `scale(${Math.max(0.55, 1 - noCnt * 0.025)})`;
+  }
+
+  function handleYes() {
+    burstConfetti();
+    document.getElementById('qScreen').style.display   = 'none';
+    document.getElementById('catResult').classList.remove('show');
+    noBtn.style.display = 'none';
+    document.getElementById('yesResult').classList.add('show');
+  }
+
+  function showCat() {
+    document.getElementById('qScreen').style.display = 'none';
+    noBtn.style.display = 'none';
+    document.getElementById('catResult').classList.add('show');
+    // YES button inside card remains visible via cat-screen button
+  }
+
+  // ── Background ───────────────────────────────────────────────────
+  const bgC = document.getElementById('bgContainer');
+  const emojis = ['💕','💖','💗','💓','💘','💝','🌹','✨','💫','🌸','🥀'];
+
+  function mkHeart() {
+    const el = document.createElement('div');
+    el.className = 'bg-el';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.bottom = '-60px';
+    el.style.fontSize = (1.2 + Math.random() * 2) + 'rem';
+    const d = 7 + Math.random() * 9;
+    el.style.animationDuration = d + 's';
+    el.style.animationDelay   = (Math.random() * 3) + 's';
+    bgC.appendChild(el);
+    setTimeout(() => el.remove(), (d + 4) * 1000);
+  }
+
+  function mkPetal() {
+    const el = document.createElement('div');
+    el.className = 'petal';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.top  = '-18px';
+    el.style.transform = `rotate(${Math.random()*360}deg)`;
+    const d = 5 + Math.random() * 8;
+    el.style.animationDuration = d + 's';
+    el.style.animationDelay = (Math.random() * 4) + 's';
+    bgC.appendChild(el);
+    setTimeout(() => el.remove(), (d + 5) * 1000);
+  }
+
+  setInterval(mkHeart,  700);
+  setInterval(mkPetal,  450);
+  for (let i=0;i<12;i++) setTimeout(mkHeart, i*180);
+  for (let i=0;i<10;i++) setTimeout(mkPetal, i*120);
+
+  // ── Confetti ─────────────────────────────────────────────────────
+  function burstConfetti() {
+    const cols = ['#ff6ba8','#ffd700','#ff4d6d','#ffb3c6','#ffffff','#c9184a','#ffaaee'];
+    for (let i = 0; i < 90; i++) {
+      const c = document.createElement('div');
+      c.className = 'conf';
+      c.style.background = cols[Math.floor(Math.random() * cols.length)];
+      c.style.left = (15 + Math.random() * 70) + 'vw';
+      c.style.top  = (10 + Math.random() * 50) + 'vh';
+      c.style.animationDuration = (1 + Math.random() * 1.5) + 's';
+      c.style.animationDelay   = (Math.random() * 0.6) + 's';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3000);
+    }
+  }
+</script>
+</body>
+</html>
